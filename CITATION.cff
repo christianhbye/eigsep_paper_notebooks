@@ -1,0 +1,22 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: EIGSEP Paper Notebooks
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Christian H.
+    family-names: Bye
+    email: chbye@berkeley.edu
+    affiliation: 'Department of Astronomy, UC Berkeley'
+    orcid: 'https://orcid.org/0000-0002-7971-3390'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.18383267
+    description: Software and data DOI
+repository-code: 'https://github.com/christianhbye/eigsep_paper_notebooks'
+abstract: Software and data for the EIGSEP instrument paper.
+license: MIT
