@@ -20,3 +20,43 @@ identifiers:
 repository-code: 'https://github.com/christianhbye/eigsep_paper_notebooks'
 abstract: Software and data for the EIGSEP instrument paper.
 license: MIT
+preferred-citation:
+  type: article
+  title: "The Electromagnetically Isolated Global Signal Estimation Platform (EIGSEP)"
+  authors:
+    - family-names: Bye
+      given-names: Christian H.
+    - family-names: DeBoer
+      given-names: David R.
+    - family-names: Dexter
+      given-names: Matt
+    - family-names: Ewall-Wice
+      given-names: Aaron
+    - family-names: Fahs
+      given-names: Adam
+    - family-names: Karthik
+      given-names: Pranav
+    - family-names: Kaur
+      given-names: Komal
+    - family-names: Khalichi
+      given-names: Bahram
+    - family-names: Liu
+      given-names: Wei
+    - family-names: Monsalve
+      given-names: Raul A.
+    - family-names: Parsons
+      given-names: Aaron R.
+    - family-names: Parsons
+      given-names: Reid
+    - family-names: Rodriguez
+      given-names: Richard R.
+    - family-names: Saeed
+      given-names: Richard J.
+    - family-names: Tolley
+      given-names: Charlie G.
+    - family-names: Vazquez
+      given-names: Dominic
+    - family-names: Wright
+      given-names: Dirk
+  year: 2026
+  url: https://arxiv.org/abs/2602.02661
