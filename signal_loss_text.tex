@@ -1,0 +1,125 @@
+% signal_loss_text.tex -- GENERATED, do not edit by hand.
+%
+% Draft replacement text for the 21 cm signal-loss result. Regenerate with
+%     uv run python horizon_position/make_paper_signal_loss_figure.py
+% in the mock_analysis repo; every number below is computed from
+% signal_loss.npz, so re-running after the 21 cm ensemble is regenerated
+% updates the prose and the figure together.
+%
+% Paste the three blocks into rasti_template.tex as marked. Nothing here is
+% \input by the paper -- this file is a staging area, not a dependency.
+%
+% Numbers that depend on the 21 cm ensemble and will move when it is
+% regenerated: the model count, retained amplitudes and percentages, and every
+% distinguishability statistic. Numbers that will not move: the foreground
+% residual, the position systematic, the choice of N, and the mode counts in
+% block 3.
+
+
+% ===================================================================
+% BLOCK 1 -- section "Minimising Covariance with the 21-cm Signal".
+% Replaces the sentence beginning "We emphasise that this analysis only
+% quantifies the spectral complexity ...".
+% ===================================================================
+
+This analysis quantifies the spectral complexity of the beam-weighted
+foregrounds; on its own it says nothing about whether the cosmological signal
+survives the same filter. We therefore passed an ensemble of 1135 global
+21-cm models through the identical projection, so that the retained signal, the
+foreground residual, and the antenna-position systematic of
+section~\ref{subsec:fwd_modelling} are read off the same axes
+(Fig.~\ref{fig:singular_values}). We adopt $N=10$ filtered modes as a
+reference operating point: it is the smallest $N$ at which both the foreground
+residual ($0.62$\,mK) and the worst-case systematic from a 1\,m antenna
+displacement ($0.33$\,mK) fall below the median retained signal. At
+$N=9$ the position systematic is $3.2$\,mK against a median retained
+signal of $2.4$\,mK, and at $N=8$ the foreground residual alone
+exceeds it. At the reference point the median model retains 8 per cent
+of its band RMS, or $1.9$\,mK, and 69 per cent of the
+ensemble retains more than the foreground residual. Retention scales
+approximately with signal amplitude: a model with a 150\,mK absorption trough
+retains $\sim5$\,mK.
+
+Retained RMS understates what such a filter leaves measurable. The projection
+discards the components of a signal that lie along the foreground modes and
+keeps the orthogonal complement, so the relevant question is not how much
+amplitude survives but which models remain distinguishable within the subspace
+that does. Restricting to the 610 ensemble members with absorption troughs
+deeper than 50\,mK and scoring over 70--130\,MHz, the median
+separation between a pair of models falls from 101\,mK to
+8\,mK under the filter, yet 99 per cent of pairs remain
+separated by more than 1\,mK and 96 per cent by more than 2\,mK. A
+measurement in the filtered subspace therefore constrains the signal to a
+family of models differing by components that lie along the foreground modes,
+rather than collapsing the ensemble to an indistinguishable residual.
+
+These figures are a floor rather than a forecast. The filter used here is
+maximally agnostic: its modes are estimated from the antenna temperature
+itself, and no knowledge of the beam or the sky enters. EDGES
+\citep{2025PASP..137l5002C} and MIST \citep{2024MNRAS.530.4125M} instead divide
+out a simulated beam chromaticity correction before fitting, and REACH
+\citep{2022JAI....1150001C} marginalises over a parametrised beam within its
+forward model. EIGSEP is designed to do likewise, using the beam measurements
+of section~\ref{subsec:beam_mapping} and the forward model of
+section~\ref{subsec:fwd_modelling}; every mode of chromaticity that is modelled
+rather than filtered is one fewer mode removed from the signal. Filtering is
+also a hard projection, whereas a joint fit for the signal and the foregrounds
+recovers part of what a projection discards, and the rotational degrees of
+freedom described below provide further leverage that a per-spectrum filter
+cannot use. Finally, the calculation uses a single simulated sky and beam and
+contains no noise, so it describes spectral subspace overlap and not
+sensitivity; whether a retained amplitude is detectable is set by the thermal
+noise and integration time, which we do not model here.
+Fig.~\ref{fig:singular_values} should accordingly not be read as a requirement
+that EIGSEP calibrate at the millikelvin level to detect a typical signal. It
+is the residual left by the most conservative foreground filter available, and
+it sets the scale of the improvement that beam knowledge and joint fitting are
+required to deliver.
+
+
+% ===================================================================
+% BLOCK 2 -- caption for signal_loss.pdf, replacing the
+% foreground_svd_residual.pdf caption. Keep \label{fig:singular_values}:
+% the horizon_shift caption already refers to it.
+% ===================================================================
+
+\caption{Signal loss under foreground-mode filtering. An ensemble of 1135
+global 21-cm models is passed through the same projection onto the leading $N$
+eigenmodes of the simulated antenna temperature that is applied to the
+foregrounds. Panels (a1) and (a2) show every model before and after filtering
+$N=10$ modes, each coloured by the band RMS it retains at that operating
+point; the colour scale is logarithmic and shared with panel (b), so a curve's
+colour and its height in (b) agree. Panel (b) shows retained RMS against the
+number of modes filtered, with the foreground residual (black) and the
+worst-case systematic from a 1\,m antenna displacement (grey dashed,
+Fig.~\ref{fig:horizon_shift}) for reference; colour marks the signal, greyscale
+the floors it is measured against. At $N=10$ the foreground residual is
+$0.62$\,mK and the position systematic $0.33$\,mK, while the
+median model retains $1.9$\,mK, or 8 per cent of its band RMS,
+and 69 per cent of the ensemble retains more than the foreground
+residual. The structure surviving in (a2) is ringing from projecting onto a
+truncated smooth basis rather than a residual absorption trough, so retained
+RMS should not be read as retained signal shape. This filter uses no knowledge
+of the beam or the sky and is therefore the most conservative case; see the
+text.}
+
+
+% ===================================================================
+% BLOCK 3 -- section "Minimising Covariance", rotation paragraph.
+% Insert after "... we aim to use both to improve constraints."
+% Numbers from horizon_position/rotation_dimensionality.py.
+% ===================================================================
+
+Rotation adds spectral diversity to the data, and it is worth asking what that
+diversity costs in model complexity. Repeating the eigenmode analysis above
+over the full drive grid of 1296 pointings (36 elevations
+$\times$ 36 azimuths) rather than the zenith pointing alone, the pooled
+antenna temperature is described to the same residual by 16 modes
+instead of 10. The foregrounds seen across every accessible orientation
+therefore occupy a subspace only marginally larger than that of a single
+pointing. Realising the benefit of that diversity requires a joint fit in which
+the sky and the beam are shared parameters and the rotations are known; a
+per-spectrum projection of the kind used in Fig.~\ref{fig:singular_values}
+cannot exploit it, because the information lies in the correlation between
+pointings rather than within any one spectrum. We defer this analysis to future
+work.
