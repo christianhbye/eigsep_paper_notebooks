@@ -119,7 +119,7 @@ def plot_frequency(ax, f_meas_mhz, s_meas_db, f_sim, s_sim, legend=True):
     ax.tick_params(labelsize=7)
     ax.grid(alpha=0.4)
     if legend:
-        ax.legend(fontsize=7, loc="lower right", framealpha=0.9)
+        ax.legend(fontsize=7, loc="upper right", framealpha=0.9)
 
 
 def plot_delay(ax, tau, db, floor=None):  # floor kept for callers; not drawn
