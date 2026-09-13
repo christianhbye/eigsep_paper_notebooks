@@ -2,3 +2,5 @@
 *.csv
 *.npz
 *.png
+zenodo_upload/
+__pycache__/

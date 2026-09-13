@@ -1,0 +1,137 @@
+# ZENODO UPLOAD SET  --  new version of record 20712533
+#
+# Everything in this directory is gitignored except this manifest. Drag the
+# staged files into a new Zenodo version. The paper (rasti_template.tex:891)
+# cites the concept DOI 10.5281/zenodo.18383267, which always resolves to the
+# newest version, so it needs no edit. A new version is required this round regardless of
+# which rows below are metadata-only, because beam_modulation.npz is
+# genuinely new data and position_sims.npz has never been deposited.
+#
+# foreground_svd.npz is load-bearing, not the orphan an early draft took it
+# for: horizon_shift.ipynb derives its Vh/s_fg foreground-mode basis from
+# foreground_svd.npz in-notebook (SVD of t_sys - t_receiver), so it must stay
+# in the deposit. As of 2026-09-11 it also finally has a generator --
+# mock_analysis/horizon_position/make_foreground_svd.py -- where before it was
+# read by every notebook and written by nothing.
+#
+# To refresh after regenerating any figure, from the notebooks directory:
+#   for f in beam_comparison.npz sparams.csv 21cm_models.npz beam_modulation.npz \
+#            horizon_shift.npz s11_terrain.npz foreground_svd.npz beam_maps.npz \
+#            virA_fringes.npz s11.npz horizon_perturbations.npz; do
+#     cp -p "$f" zenodo_upload/
+#   done
+#   cp -p "$MOCK/horizon_position/output/position_sims.npz" zenodo_upload/
+#     with MOCK=~/Documents/research/eigsep/mock_analysis
+#   md5sum zenodo_upload/*.npz zenodo_upload/*.csv
+# and check the sums below still match -- they will not if a figure moved.
+#
+# rfi_waterfall.npz is deliberately excluded from this directory -- see
+# DO NOT STAGE below. It is never in the refresh loop above.
+#
+# Staged 2026-09-11 (horizon rerun; see THE 2026-09-11 REGENERATION below).
+# horizon_shift.npz and horizon_perturbations.npz re-staged 2026-09-12 from a
+# clean mock_analysis@bbde8af: arrays, description and params byte-identical
+# to the files behind the committed figures; only the provenance SHA changed.
+
+FILE                           BYTES  MD5                                ACTION
+position_sims.npz           40931154  4ecf83e54557f96adf61318ff19c22f2   ADD      NEW -- the 19-position run behind Figs 1, 13 and 14; see below
+beam_comparison.npz          6457116  4f210b7697d054177eb71cd71017f589   REPLACE  3 per-beam t_sys waterfalls (3,1436,201), rebuilt on the corrected horizon
+sparams.csv                     4814  0e14699ac18a234c605a79c782c7d67d   ADD      HFSS S11, Fig. 3(a) -- unchanged, carried over from the existing staging set
+21cm_models.npz              2810209  3a18ee77c6d6ca1942e821f3e449685a   ADD      Zeus21 ensemble, data unchanged -- first consumer: beam_comparison.ipynb (T21_sky * eta)
+beam_modulation.npz            66054  e69ef3d845fdb22d4a31fcdca4a5a279   ADD      Fig. 12 plot data -- new, no prior deposit at all
+horizon_shift.npz             594930  87b6c9b6691efdea3965a9c9db6d0448   REPLACE  rebuilt on the corrected horizon; also clears the stale N=9 floors; carries Vh/s_fg as its generator writes them
+s11_terrain.npz                67016  eb22d545b7207b8644a0180093b3ca56   REPLACE  per-height spec(7,512) + heights/freqs; windowed delay transform moved into notebook
+foreground_svd.npz           2337040  4900b94352c6c4568544e6dd0590136a   REPLACE  rebuilt on the corrected horizon, and now written by a committed generator
+beam_maps.npz                1189538  8b4c68bbf4fcde009f47237a3c862a83   REPLACE  metadata keys only
+virA_fringes.npz             7104196  515583cffa0afa86bdea1a94498e446e   REPLACE  metadata keys only
+s11.npz                       183324  bfd90d81b015f77125464b06384edbb8   REPLACE  metadata keys only
+horizon_perturbations.npz    2546920  ce1e6068f0dcea36f2be6b3dbc0109b9   REPLACE  rebuilt on the corrected horizon; alpha_h at 46080 points, plus smooth_deg for Fig. 13
+
+DO NOT STAGE (left out of this directory):
+  rfi_waterfall.npz -- 90 MB and unchanged: its md5 (3b98317bf8edb3aac927ba732fb5a360)
+  matches the copy already in record 20712533, so the new version inherits it
+  as is. It carries no description/provenance/params keys and none were added
+  this round; tests/test_npz_contract.py exempts it.
+
+
+THE 2026-09-11 REGENERATION
+---------------------------
+Four files were rebuilt because the horizon model was corrected twice over:
+
+  1. eigsep_terrain's dem.py read the float32 lidar GeoTIFFs as int32,
+     truncating every elevation to a whole metre. Now float32.
+  2. calc_horizon bins each DEM pixel into a whole number of azimuth bins and
+     takes the max per bin, so at n_az=720 a horizontal antenna move re-sorts
+     which pixel wins each bin and alpha_h jumps discontinuously. N_AZ is now
+     46080 (0.0078 deg). Finer azimuth sampling resolves those flips more
+     sharply but cannot remove them: below a degree the difference curves are
+     still DEM pixel selection, not a response to the antenna moving. For East,
+     corr(+d,-d) for a +/-0.1 m pair is -0.30 and the RMS ratio 1 m / 0.1 m is
+     5.96 at native resolution, against a geometric -1 and 10; through a
+     1.395 deg running mean they reach -0.998 and 10.06. Up passes either way.
+
+     horizon_perturbations.npz therefore ships alpha_h at 46080 points,
+     unsmoothed, plus smooth_deg = 360/258 deg. The simulations band-limit the
+     curve to 720 bins before their sky mask point-samples it in azimuth -- one
+     call to mock_analysis horizon_position/masks.py reduce_azimuth -- and
+     Fig. 13 draws it through a smooth_deg running mean, the MWSS azimuth cell
+     at which open_sky_weight samples the horizon. The mask's phi treatment is
+     a known second-order approximation, measured at 0.60 per cent on dT_ant
+     and tracked in eigsep_mock_analysis#10.
+
+(2) was the substantive one; (1) barely moves the 720-bin result. Fig. 1 is
+unchanged to every quoted digit (6/10/18 modes, 13.3/7.7/3.5 per cent retained,
+N_ANCHOR 10). Fig. 14 keeps N_ANCHOR=10 and N_HAND=9; three quoted mK values
+shift in the last digit and the caption's northward crossing goes 4 -> 2 modes,
+because the northward dT_ant was overstated ~44 per cent by the binning
+artefact. Fig. 13 draws the 46080-point curve through the 1.395 deg running
+mean; its East cliff at az 170 peaks at 0.85 deg.
+
+horizon_shift.npz's floors were ALSO stale for an unrelated, already-known
+reason: the deposited copy carried the N=9 floors (nominal 1.82 mK, 30 mK at
+10 m) while the manuscript quotes the corrected N=10 ones (0.62 mK, 3.4 mK) --
+revision-round2-plan.md Step 0b. Both are fixed in this row.
+
+
+WHY position_sims.npz IS NOW DEPOSITED
+--------------------------------------
+foreground_svd.npz is exactly row 0 of position_sims.npz plus metadata, and it
+is all a reader needs to REDRAW the figures. It is not enough to CHECK the
+analysis, and three numbers the paper quotes could not be verified from the
+deposit at all:
+
+  - max_dT_full = 9.5 K, quoted verbatim in the Fig. 14 caption, is the peak
+    over all 1436 simulated LSTs. Recomputing it from the deposited dT_disp
+    (24 LSTs) gives 8.9 K -- 6.3 per cent low. A referee checking that caption
+    against the deposit would conclude it was wrong.
+  - floor_own (the 0.53-0.73 mK range in section 4.7) requires an SVD of each
+    DISPLACED waterfall. None were deposited.
+  - cv_penalty, the held-out-LST ratio separating basis mismatch from
+    in-sample optimism, needs the full LST set.
+
+Deposited as float64 (40.9 MB; savez_compressed saves nothing on float64 sim
+output). float32 would halve it to 19.3 MB at 3.1e-8 round-trip error, but
+byte-equality is load-bearing here -- horizon_shift.ipynb asserts
+np.array_equal(t_sys[0], foreground_svd t_sys) and
+test_beam_comparison_beams_are_in_the_figure_order checks the bowtie row
+against it -- so a precision seam would cost the property those checks rest on.
+Precedent for the size: rfi_waterfall.npz is already 90 MB in the record.
+
+Keep BOTH files. foreground_svd.npz is the 2.3 MB slice the notebooks name and
+the tests reference; position_sims.npz is the full run behind it.
+
+
+21cm_models.npz REPLACES the never-deposited signal_loss.npz (5.93 MB -> 2.81
+MB), renamed because signal_loss.pdf is retired -- it became the centre panel
+of beam_comparison.pdf. Data unchanged from the previous staging:
+  - T21_models still dropped: exactly eta[bowtie] * T21_sky, and eta is in
+    beam_comparison.npz. Verified equal to machine precision.
+  - Vh and s_fg were never carried here. horizon_shift.npz does carry them,
+    because its generator writes them, but no notebook reads them from the
+    deposit: both notebooks derive Vh/s_fg in-notebook via SVD of
+    foreground_svd.npz's t_sys - t_receiver, which is why foreground_svd.npz is
+    load-bearing (see header). tests/test_npz_contract.py checks that the
+    stored Vh gives the same curves.
+
+signal_loss.npz was never deposited and is now deleted locally, fully
+superseded by 21cm_models.npz -- nothing to do.
