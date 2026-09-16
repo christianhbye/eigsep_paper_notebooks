@@ -32,26 +32,73 @@
 # horizon_shift.npz and horizon_perturbations.npz re-staged 2026-09-12 from a
 # clean mock_analysis@bbde8af: arrays, description and params byte-identical
 # to the files behind the committed figures; only the provenance SHA changed.
+# RE-STAGED 2026-09-16 from the phase-1 pipeline -- five rows below carry new
+# sums. This version was never published, so this replaces the staged set
+# rather than adding another version. See THE 2026-09 PHASE-1 REGENERATION.
 
 FILE                           BYTES  MD5                                ACTION
-position_sims.npz           40931154  4ecf83e54557f96adf61318ff19c22f2   ADD      NEW -- the 19-position run behind Figs 1, 13 and 14; see below
-beam_comparison.npz          6457116  4f210b7697d054177eb71cd71017f589   REPLACE  3 per-beam t_sys waterfalls (3,1436,201), rebuilt on the corrected horizon
+position_sims.npz           40914773  177fbc5a4d884904e62698fa89512089   ADD      NEW -- the 19-position run behind Figs 1, 13 and 14; see below
+beam_comparison.npz          6455286  5f34513baf25b26841e8b56437f6b927   REPLACE  3 per-beam t_sys waterfalls (3,1436,201), rebuilt on the phase-1 horizon mask
 sparams.csv                     4814  0e14699ac18a234c605a79c782c7d67d   ADD      HFSS S11, Fig. 3(a) -- unchanged, carried over from the existing staging set
 21cm_models.npz              2810209  3a18ee77c6d6ca1942e821f3e449685a   ADD      Zeus21 ensemble, data unchanged -- first consumer: beam_comparison.ipynb (T21_sky * eta)
 beam_modulation.npz            66054  e69ef3d845fdb22d4a31fcdca4a5a279   ADD      Fig. 12 plot data -- new, no prior deposit at all
-horizon_shift.npz             594930  87b6c9b6691efdea3965a9c9db6d0448   REPLACE  rebuilt on the corrected horizon; also clears the stale N=9 floors; carries Vh/s_fg as its generator writes them
+horizon_shift.npz             595019  725bd018a7156fc762aa73b22801d1ea   REPLACE  rebuilt on the phase-1 horizon mask; also clears the stale N=9 floors; carries Vh/s_fg as its generator writes them
 s11_terrain.npz                67016  eb22d545b7207b8644a0180093b3ca56   REPLACE  per-height spec(7,512) + heights/freqs; windowed delay transform moved into notebook
-foreground_svd.npz           2337040  4900b94352c6c4568544e6dd0590136a   REPLACE  rebuilt on the corrected horizon, and now written by a committed generator
+foreground_svd.npz           2337040  05f3939be95af1875069f5f64aeb4159   REPLACE  rebuilt on the phase-1 horizon mask, and now written by a committed generator
 beam_maps.npz                1189538  8b4c68bbf4fcde009f47237a3c862a83   REPLACE  metadata keys only
 virA_fringes.npz             7104196  515583cffa0afa86bdea1a94498e446e   REPLACE  metadata keys only
 s11.npz                       183324  bfd90d81b015f77125464b06384edbb8   REPLACE  metadata keys only
-horizon_perturbations.npz    2546920  ce1e6068f0dcea36f2be6b3dbc0109b9   REPLACE  rebuilt on the corrected horizon; alpha_h at 46080 points, plus smooth_deg for Fig. 13
+horizon_perturbations.npz    2546923  dbb071fbaabcbf48a0ca7dffc296d1f5   REPLACE  rebuilt on the phase-1 horizon mask; alpha_h at 46080 points, plus smooth_deg for Fig. 13
 
 DO NOT STAGE (left out of this directory):
   rfi_waterfall.npz -- 90 MB and unchanged: its md5 (3b98317bf8edb3aac927ba732fb5a360)
   matches the copy already in record 20712533, so the new version inherits it
   as is. It carries no description/provenance/params keys and none were added
   this round; tests/test_npz_contract.py exempts it.
+
+
+THE 2026-09 PHASE-1 REGENERATION
+--------------------------------
+Five rows were re-staged on 2026-09-16. Three changes in mock_analysis, all of
+them upstream of the simulation rather than in the analysis:
+
+  1. The open-sky mask is now eigsim.open_sky_weight's FRACTIONAL weight,
+     integrated over the phi cell as well as theta. The previous mask
+     point-sampled in azimuth after a separate reduce_azimuth pass; the phi
+     integral IS the band-limiting, so doing both applied it twice. This
+     closes eigsep_mock_analysis#10, tracked in the 2026-09-11 section below
+     as a known second-order approximation worth 0.60 per cent on dT_ant.
+  2. croissant's fixed-pole frame fix (mock_analysis 754627c): the sky ALM are
+     precomputed in croissant's frame of date.
+  3. croissant v5.3.0.dev3 (rev 58bf56e), which carries croissant#152 --
+     Euler angles taken from the nearest true rotation.
+
+(3) moves nothing the paper quotes. The runs either side of it differ by up to
+0.25 K raw, but by 0.0009 mK after filtering N_ANCHOR modes -- 0.1 per cent of
+the foreground floor and of the median retained signal, because the difference
+is smooth and sits in the leading modes. The audit is committed as
+mock_analysis/horizon_position/compare_dev_runs.py and pins the sha256 of both
+runs. (1) and (2) are the substantive pair.
+
+What moved: Fig. 14's horizontal-displacement panels, and three quoted numbers
+(the caption's eastward/northward crossings 7/2 -> 10/4 modes; the 1 m maxima
+5.7/0.5 -> 6.3/0.6 K; the 10 m northward floor 0.67 -> 0.68 mK). Fig. 13
+renders pixel-identical. Fig. 1 is unchanged to every quoted digit -- 6/10/18
+modes, 13.3/7.7/3.5 per cent retained, N_ANCHOR 10 -- and eta moves in the
+fourth decimal (bowtie 0.5540 -> 0.5538).
+
+beam_comparison.npz is also reproducible again. Its generator had never been
+updated for the 2026-09-09 deposit contract, so the committed notebook wrote
+the pre-contract plot-ready format; the code that wrote the deposited file was
+never committed. Repaired in mock_analysis 9dda0cf and a02c58a, and verified by
+rebuilding from the archived round-2 inputs: byte-equal on every array, with
+only description and provenance deliberately rewritten.
+
+Provenance: mock_analysis a02c58a (horizon_shift, horizon_perturbations,
+foreground_svd) and 1ef9ef8 (beam_comparison), both on main at or below
+0ce491c, tagged rasti-round2-figs-v2. The round-2 set stays reproducible from
+tag rasti-round2-figs with the archived inputs in
+mock_analysis/horizon_position/output/rasti_round2_deposit/.
 
 
 THE 2026-09-11 REGENERATION
